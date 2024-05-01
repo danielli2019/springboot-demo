@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.demo.springbootpgsqldemo.dao.BookMapper">
+    <resultMap id="BookResultMap" type="com.test.demo.springbootpgsqldemo.entity.Book">
+        <id column="book_id" property="bookId" jdbcType="VARCHAR" />
+        <result column="book_name" property="bookName" jdbcType="VARCHAR" />
+        <result column="create_date" property="createDate" jdbcType="DATE" />
+        <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectAll" resultMap="BookResultMap">
+        select *
+        from books.book
+    </select>
+
+    <select id="getByPrimaryKey" parameterType="java.lang.String" resultMap="BookResultMap">
+        select *
+        from books.book
+        where book_id = #{bookId}
+    </select>
+
+    <insert id="insert" parameterType="com.test.demo.springbootpgsqldemo.entity.Book">
+        insert into
+            books.book(book_id, book_name, create_date, create_by)
+        values (#{bookId}, #{bookName}, now(), #{createBy})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.test.demo.springbootpgsqldemo.entity.Book">
+        update books.book set
+        <if test="bookName!=null">
+            book_name = #{bookName}
+        </if>
+        where book_id = #{bookId}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from books.book where book_id = #{bookId}
+    </delete>
+</mapper>

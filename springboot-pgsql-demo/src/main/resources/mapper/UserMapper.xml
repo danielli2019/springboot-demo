@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.demo.springbootpgsqldemo.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.test.demo.springbootpgsqldemo.entity.User">
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from books.t_user1
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.test.demo.springbootpgsqldemo.entity.User">
+    insert into books.t_user1 (user_id, user_name)
+    values (#{userId,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.test.demo.springbootpgsqldemo.entity.User">
+    update books.t_user1
+    set user_name = #{userName,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select user_id, user_name
+    from books.t_user1
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select user_id, user_name
+    from books.t_user1
+  </select>
+</mapper>
