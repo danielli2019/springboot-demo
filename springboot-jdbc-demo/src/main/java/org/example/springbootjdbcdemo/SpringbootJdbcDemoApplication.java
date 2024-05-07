@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class SpringbootJdbcDemoApplication {
     }
 
     @PostConstruct
-    public void Test() {
+    public void Test() throws SQLException {
         System.out.println("test jdbc()");
 
 //        try {
@@ -36,6 +37,7 @@ public class SpringbootJdbcDemoApplication {
         System.out.println("bookId: " + bookId);
         book1.setBookId(bookId);
         book1.setBookName("test" + bookId);
+        bookRepository.setIsTransaction(true);
         bookRepository.save(book1);
 
         book1.setCreateBy("daniel");

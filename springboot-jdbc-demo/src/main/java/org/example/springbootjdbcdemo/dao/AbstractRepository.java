@@ -47,11 +47,16 @@ public abstract class AbstractRepository<T, K> {
         }
     }
 
-    public int save(T entity) {
+    public int save(T entity) throws SQLException {
         String sql = getInsertSql();
+        Connection connection = null;
+        PreparedStatement pstmt = null;
 
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        try {
+            connection = databaseConnectionManager().getConnection();
+            connection.setAutoCommit(!isTransaction);
+
+            pstmt = connection.prepareStatement(sql);
             Object[] args = getInsertArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
@@ -62,10 +67,31 @@ public abstract class AbstractRepository<T, K> {
             }
             System.out.println(pstmt.toString());
             rows = pstmt.executeUpdate();
+
+            // simulate sql error
+            pstmt.setObject(1, null);
+            rows = pstmt.executeUpdate();
+
+            if(isTransaction) {
+                System.out.println("#### data is commit");
+                connection.commit();
+            }
+
             return rows;
         } catch (SQLException e) {
             e.printStackTrace();
+            if(isTransaction) {
+                System.out.println("#### data is rollback");
+                connection.rollback();
+            }
             throw new RuntimeException(e);
+        } finally {
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 
@@ -131,11 +157,11 @@ public abstract class AbstractRepository<T, K> {
 
     protected abstract T mapRowToEntity(ResultSet rs);
 
-    public boolean isTransaction() {
+    public boolean getIsTransaction() {
         return isTransaction;
     }
 
-    public void setTransaction(boolean transaction) {
+    public void setIsTransaction(boolean transaction) {
         isTransaction = transaction;
     }
 }
