@@ -3,12 +3,15 @@ package org.example.springbootjdbcdemo.dao.impl;
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.dao.AbstractRepository;
 import org.example.springbootjdbcdemo.entity.Book;
+import org.example.springbootjdbcdemo.util.ClassUtil;
+import org.example.springbootjdbcdemo.util.ColumnUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Implement method 2, choose this one
@@ -31,28 +34,29 @@ public class BookRepository extends AbstractRepository<Book, String> {
 
     @Override
     protected Object[] getInsertArgs(Book entity) {
-        Object[] args = new Object[4];
-        args[0] = entity.getBookId();
-        args[1] = entity.getBookName();
-        args[2] = new Date();
-        args[3] = entity.getCreateBy();
+        String[] columns = "book_id, book_name, create_date, create_by".split(",");
+        Object[] args = new Object[columns.length];
+        Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
+        for (int i = 0; i < columns.length; i++) {
+            args[i] = columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim()));
+        }
         return args;
     }
 
     @Override
     protected String getUpdateSql() {
-        return "update books.book set book_id = ?, book_name = ?, create_date = ?, create_by = ?" +
+        return "update books.book set book_name = ?, create_date = ?, create_by = ?" +
                 " where book_id = ?";
     }
 
     @Override
     protected Object[] getUpdateArgs(Book entity) {
-        Object[] args = new Object[5];
-        args[0] = entity.getBookId();
-        args[1] = entity.getBookName();
-        args[2] = new Date();
-        args[3] = entity.getCreateBy();
-        args[4] = entity.getBookId();
+        String[] columns = "book_name, create_date, create_by, book_id".split(",");
+        Object[] args = new Object[columns.length];
+        Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
+        for (int i = 0; i < columns.length; i++) {
+            args[i] = columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim()));
+        }
         return args;
     }
 
@@ -76,13 +80,8 @@ public class BookRepository extends AbstractRepository<Book, String> {
     }
 
     @Override
-    protected Book mapRowToEntity(ResultSet rs) throws SQLException {
-        Book book = new Book();
-        book.setBookId(rs.getString("book_id"));
-        book.setBookName(rs.getString("book_name"));
-        book.setCreateDate(rs.getDate("create_date"));
-        book.setCreateBy(rs.getString("create_by"));
-        book.setRecordStatus(rs.getString("record_status"));
+    protected Book mapRowToEntity(ResultSet rs) {
+        Book book = ClassUtil.rsToEntity(rs, Book.class);
         return book;
     }
 }

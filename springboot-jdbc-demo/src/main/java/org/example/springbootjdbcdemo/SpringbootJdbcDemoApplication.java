@@ -38,10 +38,13 @@ public class SpringbootJdbcDemoApplication {
         book1.setBookName("test" + bookId);
         bookRepository.save(book1);
 
+        book1.setCreateBy("daniel");
+        bookRepository.update(book1);
+
         // Query book
 //            Book book = bookDao.selectByPrimaryKey(bookId);
         Book book = bookRepository.findById(bookId);
-        System.out.println(book);
+        System.out.println(book.getCreateBy());
 
         List<Book> books = bookRepository.findAll();
         System.out.println(books.size());
