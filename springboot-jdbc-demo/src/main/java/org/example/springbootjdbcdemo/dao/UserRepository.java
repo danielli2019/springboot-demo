@@ -17,8 +17,6 @@ public class UserRepository extends AbstractRepository<User, Integer> {
     @Autowired
     DatabaseConnectionManager databaseConnectionManager;
 
-    private Connection connection;
-
     @Override
     protected DatabaseConnectionManager databaseConnectionManager() {
         return databaseConnectionManager;
@@ -77,15 +75,6 @@ public class UserRepository extends AbstractRepository<User, Integer> {
     protected User mapRowToEntity(ResultSet rs) {
         User user = ClassUtil.rsToEntity(rs, User.class);
         return user;
-    }
-
-    @Override
-    protected Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     public int getMaxId() {

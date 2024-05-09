@@ -22,8 +22,6 @@ public class BookRepository extends AbstractRepository<Book, String> {
     @Autowired
     DatabaseConnectionManager databaseConnectionManager;
 
-    private Connection connection;
-
     @Override
     protected DatabaseConnectionManager databaseConnectionManager() {
         return databaseConnectionManager;
@@ -88,12 +86,5 @@ public class BookRepository extends AbstractRepository<Book, String> {
         return book;
     }
 
-    @Override
-    protected Connection getConnection() {
-        return connection;
-    }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
 }

@@ -12,6 +12,8 @@ import java.util.List;
 
 public abstract class AbstractRepository<T, K> {
 
+    private Connection connection;
+
     public T findById(K id) {
         String sql = getSelectSql(false);
         Connection connection = getConnection();
@@ -137,5 +139,11 @@ public abstract class AbstractRepository<T, K> {
 
     protected abstract T mapRowToEntity(ResultSet rs);
 
-    protected abstract Connection getConnection();
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
 }
