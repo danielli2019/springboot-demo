@@ -97,7 +97,7 @@ public class BookDaoImpl extends DbAbstract implements BookDao {
             if (resultSet.next()) {
                 book.setBookId(resultSet.getString("book_id"));
                 book.setBookName(resultSet.getString("book_name"));
-                book.setCreateDate(resultSet.getDate("create_date"));
+//                book.setCreateDate(resultSet.getDate("create_date"));
                 book.setCreateBy(resultSet.getString("create_by"));
                 book.setRecordStatus(resultSet.getString("record_status"));
             }

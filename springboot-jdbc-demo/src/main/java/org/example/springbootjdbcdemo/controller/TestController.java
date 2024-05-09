@@ -5,7 +5,6 @@ import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.dao.BookRepository;
 import org.example.springbootjdbcdemo.dao.UserRepository;
 import org.example.springbootjdbcdemo.entity.Book;
-import org.example.springbootjdbcdemo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +49,12 @@ public class TestController {
             userRepository.setConnection(connection);
             bookRepository.setConnection(connection);
 
-            User user1 = new User();
-            int id = userRepository.getMaxId() + 1;
-            System.out.println("id: " + id);
-            user1.setUserId(id);
-            user1.setUserName("daniel" + id);
-            userRepository.save(user1);
+//            User user1 = new User();
+//            int id = userRepository.getMaxId() + 1;
+//            System.out.println("id: " + id);
+//            user1.setUserId(id);
+//            user1.setUserName("daniel" + id);
+//            userRepository.save(user1);
 
             // Add book
             Book book1 = new Book();
@@ -61,6 +63,10 @@ public class TestController {
             System.out.println("bookId: " + bookId);
             book1.setBookId(bookId);
             book1.setBookName("test" + bookId);
+            System.out.println("#### Instant.now(): " + Instant.now());
+            System.out.println("#### LocalDateTime.now(): " + LocalDateTime.now());
+            System.out.println("#### ZonedDateTime.now(): " + ZonedDateTime.now());
+            book1.setCreateDate(ZonedDateTime.now());
             Map<String, Object> map = new HashMap<>();
             map.put("bookId", "11");
             map.put("bookName", "test");
@@ -88,6 +94,8 @@ public class TestController {
             System.out.println("#### data is rollback");
             connection.rollback();
             throw new RuntimeException(e);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.close();

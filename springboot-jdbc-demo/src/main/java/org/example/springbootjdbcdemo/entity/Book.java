@@ -1,5 +1,9 @@
 package org.example.springbootjdbcdemo.entity;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class Book {
@@ -8,7 +12,7 @@ public class Book {
 
     private String bookName;
 
-    private Date createDate;
+    private ZonedDateTime createDate;
 
     private String createBy;
 
@@ -32,11 +36,11 @@ public class Book {
         this.bookName = bookName;
     }
 
-    public Date getCreateDate() {
+    public ZonedDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(ZonedDateTime createDate) {
         this.createDate = createDate;
     }
 

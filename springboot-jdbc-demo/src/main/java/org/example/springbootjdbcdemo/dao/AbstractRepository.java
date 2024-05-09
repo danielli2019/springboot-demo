@@ -2,11 +2,8 @@ package org.example.springbootjdbcdemo.dao;
 
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +56,15 @@ public abstract class AbstractRepository<T, K> {
                 if (args[i] instanceof java.util.Date) {
                     args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
                 }
-                pstmt.setObject(i + 1, args[i]);
+                if(args[i] instanceof ZonedDateTime) {
+                    Timestamp timestamp = Timestamp.from(((ZonedDateTime)args[i]).toInstant());
+                    pstmt.setObject(i + 1, timestamp, Types.TIMESTAMP);
+                    // 不能转换一个 java.time.ZonedDateTime 实例到类型 Types.TIMESTAMP_WITH_TIMEZONE
+//                    pstmt.setObject(i + 1, args[i], Types.TIMESTAMP_WITH_TIMEZONE);
+
+                } else {
+                    pstmt.setObject(i + 1, args[i]);
+                }
             }
             System.out.println(pstmt.toString());
 
@@ -92,7 +97,15 @@ public abstract class AbstractRepository<T, K> {
                 if (args[i] instanceof java.util.Date) {
                     args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
                 }
-                pstmt.setObject(i + 1, args[i]);
+                if(args[i] instanceof ZonedDateTime) {
+                    Timestamp timestamp = Timestamp.from(((ZonedDateTime)args[i]).toInstant());
+                    pstmt.setObject(i + 1, timestamp, Types.TIMESTAMP);
+                    // 不能转换一个 java.time.ZonedDateTime 实例到类型 Types.TIMESTAMP_WITH_TIMEZONE
+//                    pstmt.setObject(i + 1, args[i], Types.TIMESTAMP_WITH_TIMEZONE);
+
+                } else {
+                    pstmt.setObject(i + 1, args[i]);
+                }
             }
             System.out.println(pstmt.toString());
             rows = pstmt.executeUpdate();
