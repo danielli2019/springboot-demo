@@ -52,7 +52,7 @@ public abstract class AbstractRepository<T, K> {
         String sql = getInsertSql();
 
         Connection connection = getConnection();
-        try(PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);) {
             Object[] args = getInsertArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
@@ -62,7 +62,13 @@ public abstract class AbstractRepository<T, K> {
                 pstmt.setObject(i + 1, args[i]);
             }
             System.out.println(pstmt.toString());
-            rows = pstmt.executeUpdate();
+
+            rows= pstmt.executeUpdate();
+            if (rows > 0) {
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    setId(rs, entity);
+                }
+            }
 
             // simulate sql error
 //            pstmt.setObject(1, null);
@@ -138,6 +144,8 @@ public abstract class AbstractRepository<T, K> {
     protected abstract String getSelectSql(boolean all);
 
     protected abstract T mapRowToEntity(ResultSet rs);
+
+    protected abstract void setId(ResultSet rs, T entity) throws SQLException;
 
     public Connection getConnection() {
         return connection;

@@ -26,7 +26,7 @@ public class UserRepository extends AbstractRepository<User, Integer> {
     protected String getInsertSql() {
         return "INSERT INTO books.t_user1" +
                 "(user_name, user_id) " +
-                "VALUES (?, ?);";
+                "VALUES (?, ?)";
     }
 
     @Override
@@ -75,6 +75,13 @@ public class UserRepository extends AbstractRepository<User, Integer> {
     protected User mapRowToEntity(ResultSet rs) {
         User user = ClassUtil.rsToEntity(rs, User.class);
         return user;
+    }
+
+    @Override
+    protected void setId(ResultSet rs, User entity) throws SQLException {
+        if(rs != null && rs.next()) {
+            entity.setIncrementId(rs.getLong("increment_id"));
+        }
     }
 
     public int getMaxId() {

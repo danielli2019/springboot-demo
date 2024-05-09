@@ -86,5 +86,10 @@ public class BookRepository extends AbstractRepository<Book, String> {
         return book;
     }
 
+    @Override
+    protected void setId(ResultSet rs, Book entity) throws SQLException {
+
+    }
+
 
 }

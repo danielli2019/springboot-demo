@@ -5,6 +5,8 @@ public class User {
 
     private String userName;
 
+    private Long incrementId;
+
     public Integer getUserId() {
         return userId;
     }
@@ -19,5 +21,13 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName == null ? null : userName.trim();
+    }
+
+    public Long getIncrementId() {
+        return incrementId;
+    }
+
+    public void setIncrementId(Long incrementId) {
+        this.incrementId = incrementId;
     }
 }
