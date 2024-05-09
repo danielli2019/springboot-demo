@@ -7,6 +7,8 @@ public class User {
 
     private Long incrementId;
 
+    private Long incrementId1;
+
     public Integer getUserId() {
         return userId;
     }
@@ -29,5 +31,13 @@ public class User {
 
     public void setIncrementId(Long incrementId) {
         this.incrementId = incrementId;
+    }
+
+    public Long getIncrementId1() {
+        return incrementId1;
+    }
+
+    public void setIncrementId1(Long incrementId1) {
+        this.incrementId1 = incrementId1;
     }
 }

@@ -66,7 +66,7 @@ public abstract class AbstractRepository<T, K> {
             rows= pstmt.executeUpdate();
             if (rows > 0) {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    setId(rs, entity);
+                    setGeneratedKey(rs, entity);
                 }
             }
 
@@ -145,7 +145,7 @@ public abstract class AbstractRepository<T, K> {
 
     protected abstract T mapRowToEntity(ResultSet rs);
 
-    protected abstract void setId(ResultSet rs, T entity) throws SQLException;
+    protected abstract void setGeneratedKey(ResultSet rs, T entity) throws SQLException;
 
     public Connection getConnection() {
         return connection;

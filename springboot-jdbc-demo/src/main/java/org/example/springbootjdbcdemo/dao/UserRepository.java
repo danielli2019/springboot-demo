@@ -78,9 +78,10 @@ public class UserRepository extends AbstractRepository<User, Integer> {
     }
 
     @Override
-    protected void setId(ResultSet rs, User entity) throws SQLException {
+    protected void setGeneratedKey(ResultSet rs, User entity) throws SQLException {
         if(rs != null && rs.next()) {
             entity.setIncrementId(rs.getLong("increment_id"));
+            entity.setIncrementId1(rs.getLong("increment_id_1"));
         }
     }
 
