@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -31,13 +32,18 @@ public class TestController {
 
     private ObjectMapper MAPPER = new ObjectMapper();
 
+    @Autowired
+    DataSource dataSource;
+
     @RequestMapping(path = "/api/test", method = RequestMethod.GET)
     public String test() throws SQLException {
         System.out.println("test jdbc()");
 
         Connection connection = null;
         try {
-            connection = databaseConnectionManager.getConnection();
+            // using Hikari pool
+            connection = dataSource.getConnection();
+//            connection = databaseConnectionManager.getConnection();
             userRepository.setConnection(connection);
             bookRepository.setConnection(connection);
 

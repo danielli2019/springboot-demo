@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -35,6 +36,9 @@ public class SpringbootJdbcDemoApplication {
     @Autowired
     DatabaseConnectionManager databaseConnectionManager;
 
+    @Autowired
+    DataSource dataSource;
+
     private ObjectMapper MAPPER = new ObjectMapper();
 
     public static void main(String[] args) {
@@ -46,7 +50,8 @@ public class SpringbootJdbcDemoApplication {
 
         Connection connection = null;
         try {
-            connection = databaseConnectionManager.getConnection();
+            connection = dataSource.getConnection();
+//            connection = databaseConnectionManager.getConnection();
             connection.setAutoCommit(false);
             userRepository.setConnection(connection);
             bookRepository.setConnection(connection);
