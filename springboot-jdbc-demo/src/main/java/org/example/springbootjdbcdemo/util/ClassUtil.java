@@ -41,8 +41,15 @@ public class ClassUtil {
                 for (int j = 0; j < fields.length; j++) {
                     Field field = fields[j];
                     if (field.getName().equals(ColumnUtil.underlineToCamel(rsmd.getColumnName(i)))) {
+//                        Class<?> type = field.getType();
+//                        Object value = rs.getObject(i, type);
                         boolean flag = field.isAccessible();
                         field.setAccessible(true);
+//                        if (type.getName().equals("java.util.sql") || type.getName().equals("java.lang.Object")) {
+//                            field.set(obj, rs.getObject(i));
+//                        } else {
+//                            field.set(obj, value);
+//                        }
                         field.set(obj, rs.getObject(i));
                         field.setAccessible(flag);
                         break;

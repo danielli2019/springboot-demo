@@ -14,6 +14,8 @@ public class Book {
 
     private String recordStatus;
 
+    private Object origin;
+
     public String getBookId() {
         return bookId;
     }
@@ -52,5 +54,13 @@ public class Book {
 
     public void setRecordStatus(String recordStatus) {
         this.recordStatus = recordStatus;
+    }
+
+    public Object getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Object origin) {
+        this.origin = origin;
     }
 }

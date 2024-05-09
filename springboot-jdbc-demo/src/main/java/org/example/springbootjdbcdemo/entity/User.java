@@ -1,16 +1,16 @@
 package org.example.springbootjdbcdemo.entity;
 
 public class User {
-    private String userId;
+    private Integer userId;
 
     private String userName;
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId == null ? null : userId.trim();
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {

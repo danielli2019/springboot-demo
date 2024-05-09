@@ -1,4 +1,4 @@
-package org.example.springbootjdbcdemo.dao.impl;
+package org.example.springbootjdbcdemo.dao;
 
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.dao.AbstractRepository;
@@ -8,6 +8,7 @@ import org.example.springbootjdbcdemo.util.ColumnUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -21,6 +22,8 @@ public class BookRepository extends AbstractRepository<Book, String> {
     @Autowired
     DatabaseConnectionManager databaseConnectionManager;
 
+    private Connection connection;
+
     @Override
     protected DatabaseConnectionManager databaseConnectionManager() {
         return databaseConnectionManager;
@@ -28,13 +31,13 @@ public class BookRepository extends AbstractRepository<Book, String> {
 
     @Override
     protected String getInsertSql() {
-        return "insert into books.book(book_id, book_name, create_date, create_by)" +
-                " values(?, ?, ?, ?)";
+        return "insert into books.book(book_id, book_name, create_date, create_by, origin)" +
+                " values(?, ?, ?, ?, ?)";
     }
 
     @Override
     protected Object[] getInsertArgs(Book entity) {
-        String[] columns = "book_id, book_name, create_date, create_by".split(",");
+        String[] columns = "book_id, book_name, create_date, create_by, origin".split(",");
         Object[] args = new Object[columns.length];
         Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
         for (int i = 0; i < columns.length; i++) {
@@ -45,13 +48,13 @@ public class BookRepository extends AbstractRepository<Book, String> {
 
     @Override
     protected String getUpdateSql() {
-        return "update books.book set book_name = ?, create_date = ?, create_by = ?" +
+        return "update books.book set book_name = ?, create_date = ?, create_by = ?, origin = ?" +
                 " where book_id = ?";
     }
 
     @Override
     protected Object[] getUpdateArgs(Book entity) {
-        String[] columns = "book_name, create_date, create_by, book_id".split(",");
+        String[] columns = "book_name, create_date, create_by, origin, book_id".split(",");
         Object[] args = new Object[columns.length];
         Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
         for (int i = 0; i < columns.length; i++) {
@@ -83,5 +86,14 @@ public class BookRepository extends AbstractRepository<Book, String> {
     protected Book mapRowToEntity(ResultSet rs) {
         Book book = ClassUtil.rsToEntity(rs, Book.class);
         return book;
+    }
+
+    @Override
+    protected Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }

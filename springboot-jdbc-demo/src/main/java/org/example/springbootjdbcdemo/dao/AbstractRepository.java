@@ -11,13 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractRepository<T, K> {
-    private boolean isTransaction = false;
 
     public T findById(K id) {
         String sql = getSelectSql(false);
+        Connection connection = getConnection();
 
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
 
             pstmt.setObject(1, id);
             System.out.println(pstmt.toString());
@@ -32,9 +31,9 @@ public abstract class AbstractRepository<T, K> {
 
     public List<T> findAll() {
         String sql = getSelectSql(true);
+        Connection connection = getConnection();
 
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery();) {
             List<T> entities = new ArrayList<>();
             while (rs.next()) {
@@ -49,14 +48,9 @@ public abstract class AbstractRepository<T, K> {
 
     public int save(T entity) throws SQLException {
         String sql = getInsertSql();
-        Connection connection = null;
-        PreparedStatement pstmt = null;
 
-        try {
-            connection = databaseConnectionManager().getConnection();
-            connection.setAutoCommit(!isTransaction);
-
-            pstmt = connection.prepareStatement(sql);
+        Connection connection = getConnection();
+        try(PreparedStatement pstmt = connection.prepareStatement(sql);) {
             Object[] args = getInsertArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
@@ -69,36 +63,21 @@ public abstract class AbstractRepository<T, K> {
             rows = pstmt.executeUpdate();
 
             // simulate sql error
-            pstmt.setObject(1, null);
-            rows = pstmt.executeUpdate();
-
-            if(isTransaction) {
-                System.out.println("#### data is commit");
-                connection.commit();
-            }
+//            pstmt.setObject(1, null);
+//            rows = pstmt.executeUpdate();
 
             return rows;
         } catch (SQLException e) {
             e.printStackTrace();
-            if(isTransaction) {
-                System.out.println("#### data is rollback");
-                connection.rollback();
-            }
             throw new RuntimeException(e);
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
     public int update(T entity) {
         String sql = getUpdateSql();
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        Connection connection = getConnection();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
             Object[] args = getUpdateArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
@@ -119,8 +98,9 @@ public abstract class AbstractRepository<T, K> {
 
     public int delete(T entity) {
         String sql = getDeleteSql();
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        Connection connection = getConnection();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
             Object[] args = getDeleteArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
@@ -157,11 +137,5 @@ public abstract class AbstractRepository<T, K> {
 
     protected abstract T mapRowToEntity(ResultSet rs);
 
-    public boolean getIsTransaction() {
-        return isTransaction;
-    }
-
-    public void setIsTransaction(boolean transaction) {
-        isTransaction = transaction;
-    }
+    protected abstract Connection getConnection();
 }
