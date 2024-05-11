@@ -1,13 +1,11 @@
 package org.example.springbootjdbcdemo.dao;
 
-import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
-
 import java.sql.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractRepository<T, K> {
+public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
 
     private Connection connection;
 
@@ -45,7 +43,7 @@ public abstract class AbstractRepository<T, K> {
         }
     }
 
-    public int save(T entity) throws SQLException {
+    public int save(T entity) {
         String sql = getInsertSql();
 
         Connection connection = getConnection();
@@ -74,10 +72,6 @@ public abstract class AbstractRepository<T, K> {
                     setGeneratedKey(rs, entity);
                 }
             }
-
-            // simulate sql error
-//            pstmt.setObject(1, null);
-//            rows = pstmt.executeUpdate();
 
             return rows;
         } catch (SQLException e) {
@@ -140,8 +134,6 @@ public abstract class AbstractRepository<T, K> {
         }
     }
 
-    protected abstract DatabaseConnectionManager databaseConnectionManager();
-
     protected abstract String getInsertSql();
 
     protected abstract Object[] getInsertArgs(T entity);
@@ -161,6 +153,10 @@ public abstract class AbstractRepository<T, K> {
     protected abstract void setGeneratedKey(ResultSet rs, T entity) throws SQLException;
 
     public Connection getConnection() {
+        if(connection == null) {
+            System.out.println("Connection is null.");
+            throw new RuntimeException("Connection is null.");
+        }
         return connection;
     }
 

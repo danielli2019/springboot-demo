@@ -19,13 +19,6 @@ import java.util.Map;
  */
 @Repository
 public class BookRepository extends AbstractRepository<Book, String> {
-    @Autowired
-    DatabaseConnectionManager databaseConnectionManager;
-
-    @Override
-    protected DatabaseConnectionManager databaseConnectionManager() {
-        return databaseConnectionManager;
-    }
 
     @Override
     protected String getInsertSql() {

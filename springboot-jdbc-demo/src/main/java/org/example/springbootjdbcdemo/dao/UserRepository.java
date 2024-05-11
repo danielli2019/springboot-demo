@@ -14,13 +14,6 @@ import java.sql.SQLException;
 
 @Repository
 public class UserRepository extends AbstractRepository<User, Integer> {
-    @Autowired
-    DatabaseConnectionManager databaseConnectionManager;
-
-    @Override
-    protected DatabaseConnectionManager databaseConnectionManager() {
-        return databaseConnectionManager;
-    }
 
     @Override
     protected String getInsertSql() {
@@ -87,9 +80,9 @@ public class UserRepository extends AbstractRepository<User, Integer> {
 
     public int getMaxId() {
         String sql = "select max(user_id) from books.t_user1";
+        Connection connection = getConnection();
 
-        try (Connection connection = databaseConnectionManager().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
 
             System.out.println(pstmt.toString());
             try (ResultSet rs = pstmt.executeQuery()) {
