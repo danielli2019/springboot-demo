@@ -1,9 +1,13 @@
 package org.example.springbootjdbcdemo.dao;
 
+import org.example.springbootjdbcdemo.util.ClassUtil;
+import org.example.springbootjdbcdemo.util.ColumnUtil;
+
 import java.sql.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
 
@@ -54,8 +58,8 @@ public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
                 if (args[i] instanceof java.util.Date) {
                     args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
                 }
-                if(args[i] instanceof ZonedDateTime) {
-                    Timestamp timestamp = Timestamp.from(((ZonedDateTime)args[i]).toInstant());
+                if (args[i] instanceof ZonedDateTime) {
+                    Timestamp timestamp = Timestamp.from(((ZonedDateTime) args[i]).toInstant());
                     pstmt.setObject(i + 1, timestamp, Types.TIMESTAMP);
                     // 不能转换一个 java.time.ZonedDateTime 实例到类型 Types.TIMESTAMP_WITH_TIMEZONE
 //                    pstmt.setObject(i + 1, args[i], Types.TIMESTAMP_WITH_TIMEZONE);
@@ -66,7 +70,7 @@ public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
             }
             System.out.println(pstmt.toString());
 
-            rows= pstmt.executeUpdate();
+            rows = pstmt.executeUpdate();
             if (rows > 0) {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     setGeneratedKey(rs, entity);
@@ -91,8 +95,8 @@ public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
                 if (args[i] instanceof java.util.Date) {
                     args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
                 }
-                if(args[i] instanceof ZonedDateTime) {
-                    Timestamp timestamp = Timestamp.from(((ZonedDateTime)args[i]).toInstant());
+                if (args[i] instanceof ZonedDateTime) {
+                    Timestamp timestamp = Timestamp.from(((ZonedDateTime) args[i]).toInstant());
                     pstmt.setObject(i + 1, timestamp, Types.TIMESTAMP);
                     // 不能转换一个 java.time.ZonedDateTime 实例到类型 Types.TIMESTAMP_WITH_TIMEZONE
 //                    pstmt.setObject(i + 1, args[i], Types.TIMESTAMP_WITH_TIMEZONE);
@@ -153,7 +157,7 @@ public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
     protected abstract void setGeneratedKey(ResultSet rs, T entity) throws SQLException;
 
     public Connection getConnection() {
-        if(connection == null) {
+        if (connection == null) {
             System.out.println("Connection is null.");
             throw new RuntimeException("Connection is null.");
         }
@@ -163,4 +167,18 @@ public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
     public void setConnection(Connection connection) {
         this.connection = connection;
     }
+
+    protected Object[] buildArgs(T entity, String[] columns) {
+        Object[] args = new Object[columns.length];
+        Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].trim().equals("udt_cnt_increment")) {
+                args[i] = (int) columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim())) + 1;
+            } else {
+                args[i] = columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim()));
+            }
+        }
+        return args;
+    }
+
 }

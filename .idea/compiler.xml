@@ -9,11 +9,13 @@
         <outputRelativeToContentRoot value="true" />
         <module name="springboot-jpa-demo" />
         <module name="springboot-pgsql-demo" />
+        <module name="springboot-jdbc-demo" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="springboot-jdbc-demo" options="-parameters" />
       <module name="springboot-jpa-demo" options="-parameters" />
       <module name="springboot-pgsql-demo" options="-parameters" />
     </option>

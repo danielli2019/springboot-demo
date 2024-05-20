@@ -1,5 +1,8 @@
 package org.example.springbootjdbcdemo.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.sql.Connection;
 import java.util.List;
 
@@ -15,4 +18,6 @@ public interface IRepository<T, K> {
     int delete(T entity);
 
     Connection getConnection();
+
+    void process(JsonNode data, String userId) throws JsonProcessingException;
 }

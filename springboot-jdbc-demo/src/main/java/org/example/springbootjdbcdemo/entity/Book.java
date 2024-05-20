@@ -20,6 +20,10 @@ public class Book {
 
     private Object origin;
 
+    private ZonedDateTime modifyDate;
+
+    private String modifyBy;
+
     public String getBookId() {
         return bookId;
     }
@@ -66,5 +70,21 @@ public class Book {
 
     public void setOrigin(Object origin) {
         this.origin = origin;
+    }
+
+    public ZonedDateTime getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(ZonedDateTime modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
     }
 }

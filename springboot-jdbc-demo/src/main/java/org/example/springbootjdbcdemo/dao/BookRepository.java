@@ -1,5 +1,8 @@
 package org.example.springbootjdbcdemo.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.dao.AbstractRepository;
 import org.example.springbootjdbcdemo.entity.Book;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,12 +33,8 @@ public class BookRepository extends AbstractRepository<Book, String> {
     @Override
     protected Object[] getInsertArgs(Book entity) {
         String[] columns = "book_id, book_name, create_date, create_by, origin".split(",");
-        Object[] args = new Object[columns.length];
-        Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
-        for (int i = 0; i < columns.length; i++) {
-            args[i] = columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim()));
-        }
-        return args;
+
+        return buildArgs(entity, columns);
     }
 
     @Override
@@ -46,12 +46,8 @@ public class BookRepository extends AbstractRepository<Book, String> {
     @Override
     protected Object[] getUpdateArgs(Book entity) {
         String[] columns = "book_name, create_date, create_by, origin, book_id".split(",");
-        Object[] args = new Object[columns.length];
-        Map<String, Object> columnMap = ClassUtil.entityToMap(entity);
-        for (int i = 0; i < columns.length; i++) {
-            args[i] = columnMap.get(ColumnUtil.underlineToCamel(columns[i].trim()));
-        }
-        return args;
+
+        return buildArgs(entity, columns);
     }
 
     @Override
@@ -84,5 +80,30 @@ public class BookRepository extends AbstractRepository<Book, String> {
 
     }
 
+    @Override
+    public void process(JsonNode data, String userId) throws JsonProcessingException {
+        String action = data.get("action").asText();
+        JsonNode oldValues = data.get("oldValues");
+        JsonNode newValues = data.get("newValues");
+        ObjectMapper objectMapper = new ObjectMapper();
+        Book oldBook = objectMapper.treeToValue(oldValues, Book.class);
+        Book newBook = objectMapper.treeToValue(oldValues, Book.class);
 
+        switch (action) {
+            case "ADD":
+                save(newBook);
+                break;
+            case "UPDATE":
+                newBook.setModifyBy(userId);
+                newBook.setModifyDate(ZonedDateTime.now());
+                update(newBook);
+                break;
+            case "DELETE":
+                delete(oldBook);
+                break;
+            default:
+                System.out.println("Not supported action " + action);
+                break;
+        }
+    }
 }

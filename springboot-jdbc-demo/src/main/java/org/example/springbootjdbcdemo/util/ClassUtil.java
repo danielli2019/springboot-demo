@@ -83,6 +83,16 @@ public class ClassUtil {
         }
     }
 
+    public static <T> void mergeEntity(T oldEntity, T newEntity) throws IllegalAccessException {
+        Class clazz = oldEntity.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            field.setAccessible(true);
+            System.out.println(field.getName() + "=" + field.get(oldEntity));
+        }
+    }
+
     public static void main(String[] args) {
         Instant now = Instant.now();
         System.out.println(now);
