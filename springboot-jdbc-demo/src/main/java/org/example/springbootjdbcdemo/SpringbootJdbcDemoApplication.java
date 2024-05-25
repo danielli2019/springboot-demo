@@ -52,7 +52,7 @@ public class SpringbootJdbcDemoApplication {
         try {
             connection = dataSource.getConnection();
 //            connection = databaseConnectionManager.getConnection();
-            connection.setAutoCommit(false);
+//            connection.setAutoCommit(false);
             userRepository.setConnection(connection);
             bookRepository.setConnection(connection);
 
@@ -70,16 +70,21 @@ public class SpringbootJdbcDemoApplication {
             System.out.println("bookId: " + bookId);
             book1.setBookId(bookId);
             book1.setBookName("test" + bookId);
+            book1.setAuthor("Daniel");
+            book1.setTotalPages(100);
             Map<String, Object> map = new HashMap<>();
             map.put("bookId", "11");
             map.put("bookName", "test");
             book1.setOrigin(MAPPER.writeValueAsString(map));
             bookRepository.save(book1);
 
-            book1.setCreateBy("daniel");
-            bookRepository.update(book1);
+//            book1.setCreateBy("daniel");
+//            bookRepository.update(book1);
 
-            connection.commit();
+//            connection.commit();
+
+            Book queryBook = bookRepository.findById(book1.getBookId());
+            System.out.println(MAPPER.writeValueAsString(queryBook));
 
             // Query book
 //            Book book = bookDao.selectByPrimaryKey(bookId);

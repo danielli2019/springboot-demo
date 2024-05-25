@@ -1,0 +1,17 @@
+@startuml
+actor 用户 as user
+participant A系统 as ASystem
+database 数据库 as database
+
+user -> ASystem : 用户访问A系统
+activate ASystem
+
+ASystem -> database : 访问数据库
+activate database
+
+database -> ASystem : 数据库返回符合要求的数据
+deactivate database
+
+ASystem -> user : A系统返回数据
+deactivate ASystem
+@enduml

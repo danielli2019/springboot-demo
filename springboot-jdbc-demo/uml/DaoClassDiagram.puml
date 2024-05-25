@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class AbstractReadDao {
+-Connection connection
+#abstract String getSelectSql(boolean all)
+#abstract T mapRowToEntity(ResultSet rs)
+#abstract String getUpdateSql()
++getConnection()
++setConnection()
+}
+
+abstract class AbstractWriteDao {
+-Connection connection
+#abstract String getInsertSql()
+#abstract Object[] getInsertArgs(T entity)
+#abstract String getUpdateSql()
+#abstract Object[] getUpdateArgs(T entity)
+#abstract String getDeleteSql()
+#abstract Object[] getDeleteArgs(T entity)
+#abstract void setGeneratedKey(ResultSet rs, T entity)
+#Object[] buildArgs(T entity, String[] columns)
++getConnection()
++setConnection()
+}
+
+interface IReadDao<T, K> {
+T findById(K id)
+List<T> findAll()
+Connection getConnection()
+void process(JsonNode data, String userId)
+}
+
+interface IWriteDao<T> {
+int save(T entity)
+int update(T entity)
+int delete(T entity)
+Connection getConnection()
+void process(JsonNode data, String userId)
+}
+
+class BookReadDao
+
+IReadDao <|.. AbstractReadDao
+AbstractReadDao <|-- BookReadDao
+
+
+
+class Book {
+-Integer id
+-String name
++getName()
++setName()
++getId()
++setId()
+}
+
+
+
+@enduml

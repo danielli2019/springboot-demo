@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-public class Book {
+public class Book extends BookBase {
 
     private String bookId;
 

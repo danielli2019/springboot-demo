@@ -1,5 +1,7 @@
 package org.example.springbootjdbcdemo.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.entity.Book;
 import org.example.springbootjdbcdemo.entity.User;
@@ -92,5 +94,10 @@ public class UserRepository extends AbstractRepository<User, Integer> {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void process(JsonNode data, String userId) throws JsonProcessingException {
+
     }
 }

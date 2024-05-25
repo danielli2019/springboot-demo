@@ -1,0 +1,28 @@
+@startuml
+class Feeder<<饲养员>>{
+-void feed()
+}
+
+abstract Food
+class Bone
+class Fish
+Food <|--Bone
+Food <|--Fish
+
+abstract Animal{
+-void eat()
+}
+class Dog{
+-void eat()
+}
+class Cat{
+-void eat()
+}
+Animal <|-- Dog
+Animal <|-- Cat
+
+
+Feeder ..>Food
+Feeder ..>Animal
+
+@enduml

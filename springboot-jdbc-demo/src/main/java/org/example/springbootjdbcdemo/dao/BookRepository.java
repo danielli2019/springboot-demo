@@ -26,13 +26,13 @@ public class BookRepository extends AbstractRepository<Book, String> {
 
     @Override
     protected String getInsertSql() {
-        return "insert into books.book(book_id, book_name, create_date, create_by, origin)" +
-                " values(?, ?, ?, ?, ?)";
+        return "insert into books.book(book_id, book_name, create_date, create_by, origin, author, total_pages, effective_date, scheduled_time)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     @Override
     protected Object[] getInsertArgs(Book entity) {
-        String[] columns = "book_id, book_name, create_date, create_by, origin".split(",");
+        String[] columns = "book_id, book_name, create_date, create_by, origin, author, total_pages, effective_date, scheduled_time".split(",");
 
         return buildArgs(entity, columns);
     }

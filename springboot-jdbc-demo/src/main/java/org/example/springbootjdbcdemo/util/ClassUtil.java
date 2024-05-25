@@ -5,24 +5,28 @@ import net.sf.jsqlparser.schema.Column;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClassUtil {
     public static <T> Map<String, Object> entityToMap(T entity) {
         Map<String, Object> map = new HashMap<>();
-        Field[] fields = entity.getClass().getDeclaredFields();
+
         try {
-            for (int i = 0; i < fields.length; i++) {
-                Field field = fields[i];
-                field.setAccessible(true);
-                map.put(field.getName(), field.get(entity));
+            Class<?> clazz = entity.getClass();
+            while (clazz != null) {
+                Field[] fields = clazz.getDeclaredFields();
+                for (int i = 0; i < fields.length; i++) {
+                    Field field = fields[i];
+                    boolean flag = field.canAccess(entity);
+                    field.setAccessible(true);
+                    map.put(field.getName(), field.get(entity));
+                    field.setAccessible(flag);
+                }
+                clazz = clazz.getSuperclass();
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -39,42 +43,75 @@ public class ClassUtil {
 
             ResultSetMetaData rsmd = rs.getMetaData();
             int columnCount = rsmd.getColumnCount();
-            Field[] fields = clazz.getDeclaredFields();
+
+            Class<?> tmpClazz = clazz;
+            boolean found = false;
 
             for (int i = 1; i <= columnCount; i++) {
                 System.out.println(rsmd.getColumnName(i) + ": " + rs.getObject(i));
-                for (int j = 0; j < fields.length; j++) {
-                    Field field = fields[j];
-                    if (field.getName().equals(ColumnUtil.underlineToCamel(rsmd.getColumnName(i)))) {
-                        Class<?> type = field.getType();
-                        Object value = rs.getObject(i, type);
-                        boolean flag = field.isAccessible();
-                        field.setAccessible(true);
-//                        if (type.getName().equals("java.util.sql") || type.getName().equals("java.lang.Object")) {
-//                            field.set(obj, rs.getObject(i));
-//                        } else {
-//                            field.set(obj, value);
-//                        }
-                        if(type.getName().equals("java.time.LocalDateTime")) {
-//                            Timestamp timestamp = Timestamp.from(
-//                                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
-//                            );
 
-                            Timestamp timestamp = (Timestamp) rs.getObject(i);
+                // 遍历继承的基类属性
+                while (tmpClazz != null) {
+                    Field[] fields = tmpClazz.getDeclaredFields();
+                    for (int j = 0; j < fields.length; j++) {
+                        Field field = fields[j];
 
-                            // 将Timestamp转换为LocalDateTime
-                            // Cannot convert the column of type TIMESTAMPTZ to requested type java.time.LocalDateTime
-                            // TODO
-                            LocalDateTime localDateTime = timestamp.toLocalDateTime();
-                            field.set(obj, localDateTime);
-                        } else {
-                            field.set(obj, rs.getObject(i));
+                        if (field.getName().equals(ColumnUtil.underlineToCamel(rsmd.getColumnName(i)))) {
+                            Class<?> type = field.getType();
+//                            Object value = rs.getObject(i, type);
+                            Object value = rs.getObject(i);
+                            boolean flag = field.isAccessible();
+                            field.setAccessible(true);
+                            System.out.println(rsmd.getColumnName(i) + ": " + field.getName() + ": " + value);
+                            System.out.println(rsmd.getColumnType(i) + ": " + field.getType());
+
+                            if (rsmd.getColumnType(i) == 93 && type.getName().equals("java.time.LocalDateTime")) {
+                                Timestamp timestamp = (Timestamp) rs.getObject(i);
+
+                                // 将Timestamp转换为LocalDateTime
+                                // Cannot convert the column of type TIMESTAMPTZ to requested type java.time.LocalDateTime
+                                // TODO
+                                LocalDateTime localDateTime = timestamp.toLocalDateTime();
+                                field.set(obj, localDateTime);
+                            } else if (rsmd.getColumnType(i) == 93 && type.getName().equals("java.time.ZonedDateTime")) {
+                                // 将timestamptz转换为ZonedDateTime
+                                // java.lang.IllegalArgumentException: Can not set java.time.ZonedDateTime field org.example.springbootjdbcdemo.entity.Book.createDate to java.sql.Timestamp
+                                System.out.println("TimestampTZ to ZonedDateTime");
+                                Timestamp ts = rs.getObject(i, java.sql.Timestamp.class);
+                                if(ts != null) {
+                                    ZonedDateTime zdt = ts.toInstant().atZone(ZoneId.systemDefault());
+                                    field.set(obj, zdt);
+                                } else {
+                                    field.set(obj, null);
+                                }
+                            } else if (rsmd.getColumnType(i) == 91 && type.getName().equals("java.time.LocalDate")) {
+                                // 将Date转换位LocalDate
+                                // java.lang.IllegalArgumentException: Can not set java.time.LocalDate field org.example.springbootjdbcdemo.entity.BookBase.effectiveDate to java.sql.Date
+                                System.out.println("Date to LocalDate");
+                                Date dt = rs.getObject(i, java.sql.Date.class);
+                                if(dt != null) {
+//                                    LocalDate ld = Instant.ofEpochMilli(dt.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+                                    LocalDate ld = dt.toLocalDate();
+                                    field.set(obj, ld);
+                                } else {
+                                    field.set(obj, null);
+                                }
+                            } else {
+                                field.set(obj, rs.getObject(i));
+                            }
+                            field.setAccessible(flag);
+                            found = true;
+                            break;
                         }
-                        field.setAccessible(flag);
+                    }
+                    if (found) {
+                        found = false;
                         break;
                     }
+                    tmpClazz = tmpClazz.getSuperclass();
                 }
 
+                tmpClazz = clazz;
             }
             return obj;
         } catch (Exception ex) {
