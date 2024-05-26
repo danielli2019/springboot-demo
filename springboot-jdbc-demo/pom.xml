@@ -17,6 +17,15 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>10.1.24</version>
+        </dependency>
         <!-- Jackson JSR-310 模块 提供JSR-310（即java.time包）的额外支持 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

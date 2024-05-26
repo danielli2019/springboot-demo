@@ -1,6 +1,7 @@
 package org.example.springbootjdbcdemo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
 import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
 import org.example.springbootjdbcdemo.dao.BookRepository;
 import org.example.springbootjdbcdemo.dao.UserRepository;
@@ -41,6 +42,11 @@ public class TestController {
     @RequestMapping(path = "/api/test", method = RequestMethod.GET)
     public String test() throws SQLException {
         System.out.println("test jdbc()");
+
+        // 调用getInfo方法获取连接池状态
+        HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
+        System.out.println("HikariCP total connections: " + hikariDataSource.getHikariPoolMXBean().getTotalConnections());
+        System.out.println("HikariCP idle connections: " + hikariDataSource.getHikariPoolMXBean().getIdleConnections());
 
         Connection connection = null;
         try {
