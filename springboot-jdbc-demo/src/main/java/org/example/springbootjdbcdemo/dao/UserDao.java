@@ -2,11 +2,8 @@ package org.example.springbootjdbcdemo.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
-import org.example.springbootjdbcdemo.entity.Book;
 import org.example.springbootjdbcdemo.entity.User;
 import org.example.springbootjdbcdemo.util.ClassUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -15,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Repository
-public class UserRepository extends AbstractRepository<User, Integer> {
+public class UserDao extends AbstractDao<User, Integer> {
 
     @Override
     protected String getInsertSql() {

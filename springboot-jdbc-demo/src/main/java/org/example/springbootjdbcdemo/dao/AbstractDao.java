@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractRepository<T, K> implements IRepository<T, K> {
+public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
 
     private Connection connection;
 

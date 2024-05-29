@@ -2,9 +2,8 @@ package org.example.springbootjdbcdemo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
-import org.example.springbootjdbcdemo.common.DatabaseConnectionManager;
-import org.example.springbootjdbcdemo.dao.BookRepository;
-import org.example.springbootjdbcdemo.dao.UserRepository;
+import org.example.springbootjdbcdemo.dao.BookDao;
+import org.example.springbootjdbcdemo.dao.UserDao;
 import org.example.springbootjdbcdemo.entity.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,20 +18,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 public class TestController {
     @Autowired
-    BookRepository bookRepository;
+    BookDao bookRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserDao userRepository;
 
-    @Autowired
-    DatabaseConnectionManager databaseConnectionManager;
+//    @Autowired
+//    DatabaseConnectionManager databaseConnectionManager;
 
     private ObjectMapper MAPPER = new ObjectMapper();
 

@@ -1,7 +1,5 @@
 package org.example.springbootjdbcdemo.util;
 
-import net.sf.jsqlparser.schema.Column;
-
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
