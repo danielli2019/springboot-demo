@@ -17,8 +17,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -76,10 +74,10 @@ public class TestController {
             book1.setCreateDate(ZonedDateTime.now());
             book1.setEffectiveDate(LocalDate.now());
             book1.setScheduledTime(LocalDateTime.now());
-            Map<String, Object> map = new HashMap<>();
-            map.put("bookId", "11");
-            map.put("bookName", "test");
-            book1.setOrigin(MAPPER.writeValueAsString(map));
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("bookId", "11");
+//            map.put("bookName", "test");
+//            book1.setOrigin(MAPPER.writeValueAsString(map));
             bookRepository.save(book1);
 
             // Query book

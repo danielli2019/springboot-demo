@@ -1,17 +1,18 @@
 package org.example.springbootjdbcdemo.entity;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 public class Book extends BookBase {
 
     private String bookId;
 
+    @JsonProperty("custom-name")
     private String bookName;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createDate;
 
     private String createBy;

@@ -1,37 +1,61 @@
 package org.example.springbootjdbcdemo.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import org.example.springbootjdbcdemo.entity.Book;
+
 import java.lang.reflect.Field;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
-import java.time.*;
-import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ClassUtil {
-    public static <T> Map<String, Object> entityToMap(T entity) {
-        Map<String, Object> map = new HashMap<>();
 
-        try {
-            Class<?> clazz = entity.getClass();
-            while (clazz != null) {
-                Field[] fields = clazz.getDeclaredFields();
-                for (int i = 0; i < fields.length; i++) {
-                    Field field = fields[i];
-                    boolean flag = field.canAccess(entity);
-                    field.setAccessible(true);
-                    map.put(field.getName(), field.get(entity));
-                    field.setAccessible(flag);
-                }
-                clazz = clazz.getSuperclass();
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.findAndRegisterModules();
+//        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+    }
+
+    public static <T> Map<String, Object> entityToMap(T entity) {
+        Map<String, Object> map = objectMapper.convertValue(entity, Map.class);
+
+//        Map<String, Object> map = new HashMap<>();
+//        try {
+//            Class<?> clazz = entity.getClass();
+//            while (clazz != null) {
+//                Field[] fields = clazz.getDeclaredFields();
+//                for (int i = 0; i < fields.length; i++) {
+//                    Field field = fields[i];
+//                    boolean flag = field.canAccess(entity);
+//                    field.setAccessible(true);
+//                    map.put(field.getName(), field.get(entity));
+//                    field.setAccessible(flag);
+//                }
+//                clazz = clazz.getSuperclass();
+//            }
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
 
         return map;
+    }
+
+    public static <T> T mapToEntity(Map map, Class<?> clazz) {
+        T instance = (T) objectMapper.convertValue(map, clazz);
+        return instance;
     }
 
     public static <T> T rsToEntity(ResultSet rs, Class clazz) {
@@ -128,26 +152,53 @@ public class ClassUtil {
         }
     }
 
-    public static void main(String[] args) {
-        Instant now = Instant.now();
-        System.out.println(now);
+    public static void main(String[] args) throws JsonProcessingException {
+//        Instant now = Instant.now();
+//        System.out.println(now);
+//
+//        ZonedDateTime utcZone = now.atZone(ZoneId.of("UTC+8"));
+//        System.out.println(utcZone.toInstant());
+//
+//        long utcTimeStamp = utcZone.toInstant().toEpochMilli();
+//        System.out.println("UTC Time Stamp: " + utcTimeStamp);
+//
+//        // 获取当前的ZonedDateTime对象，时区为UTC
+//        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+//
+//        // 从ZonedDateTime对象获取Instant对象
+//        Instant instant = zonedDateTime.toInstant();
+//
+//        // 现在instant代表的是UTC时间线上的一个点
+//        System.out.println("UTC Instant: " + instant);
+//
+//        LocalDateTime localDateTime = LocalDateTime.now(); // 获取本地当前时间
+//        System.out.println("Local Date Time: " + localDateTime);
 
-        ZonedDateTime utcZone = now.atZone(ZoneId.of("UTC+8"));
-        System.out.println(utcZone.toInstant());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
+        Book book1 = new Book();
+        UUID uuid = UUID.randomUUID();
+        String bookId = uuid.toString().substring(0, 8);
+        System.out.println("bookId: " + bookId);
+        book1.setBookId(bookId);
+        book1.setBookName("test" + bookId);
+        book1.setAuthor("Daniel");
+        book1.setTotalPages(100);
+        System.out.println("#### Instant.now(): " + Instant.now());
+        System.out.println("#### LocalDateTime.now(): " + LocalDateTime.now());
+        System.out.println("#### ZonedDateTime.now(): " + ZonedDateTime.now());
+        book1.setCreateDate(ZonedDateTime.now());
+        book1.setEffectiveDate(LocalDate.now());
+        book1.setScheduledTime(LocalDateTime.now());
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("bookId", "11");
+        map1.put("bookName", "test");
+        book1.setOrigin(objectMapper.writeValueAsString(map1));
+        Map<String, String> map = objectMapper.convertValue(book1, Map.class);
+        System.out.println(map);
 
-        long utcTimeStamp = utcZone.toInstant().toEpochMilli();
-        System.out.println("UTC Time Stamp: " + utcTimeStamp);
-
-        // 获取当前的ZonedDateTime对象，时区为UTC
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
-
-        // 从ZonedDateTime对象获取Instant对象
-        Instant instant = zonedDateTime.toInstant();
-
-        // 现在instant代表的是UTC时间线上的一个点
-        System.out.println("UTC Instant: " + instant);
-
-        LocalDateTime localDateTime = LocalDateTime.now(); // 获取本地当前时间
-        System.out.println("Local Date Time: " + localDateTime);
+        Map<String, Object> map2 = ClassUtil.entityToMap(book1);
+        System.out.println(map2);
     }
 }

@@ -75,28 +75,33 @@ public class BookDao extends AbstractDao<Book, String> {
 
     @Override
     public void process(JsonNode data, String userId) throws JsonProcessingException {
-        String action = data.get("action").asText();
-        JsonNode oldValues = data.get("oldValues");
-        JsonNode newValues = data.get("newValues");
-        ObjectMapper objectMapper = new ObjectMapper();
-        Book oldBook = objectMapper.treeToValue(oldValues, Book.class);
-        Book newBook = objectMapper.treeToValue(oldValues, Book.class);
+        try {
+            String action = data.get("action").asText();
+            JsonNode oldValues = data.get("oldValues");
+            JsonNode newValues = data.get("newValues");
+            ObjectMapper objectMapper = new ObjectMapper();
+            Book oldBook = objectMapper.treeToValue(oldValues, Book.class);
+            Book newBook = objectMapper.treeToValue(oldValues, Book.class);
+            ClassUtil.mergeEntity(oldBook, newBook);
 
-        switch (action) {
-            case "ADD":
-                save(newBook);
-                break;
-            case "UPDATE":
-                newBook.setModifyBy(userId);
-                newBook.setModifyDate(ZonedDateTime.now());
-                update(newBook);
-                break;
-            case "DELETE":
-                delete(oldBook);
-                break;
-            default:
-                System.out.println("Not supported action " + action);
-                break;
+            switch (action) {
+                case "ADD":
+                    save(newBook);
+                    break;
+                case "UPDATE":
+                    newBook.setModifyBy(userId);
+                    newBook.setModifyDate(ZonedDateTime.now());
+                    update(newBook);
+                    break;
+                case "DELETE":
+                    delete(oldBook);
+                    break;
+                default:
+                    System.out.println("Not supported action " + action);
+                    break;
+            }
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
