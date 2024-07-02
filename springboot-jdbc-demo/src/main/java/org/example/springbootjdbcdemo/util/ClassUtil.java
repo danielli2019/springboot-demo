@@ -3,6 +3,11 @@ package org.example.springbootjdbcdemo.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.example.springbootjdbcdemo.common.CustomLocalDateDeserializer;
+import org.example.springbootjdbcdemo.common.CustomLocalDateSerializer;
+import org.example.springbootjdbcdemo.common.CustomLocalDateTimeDeserializer;
+import org.example.springbootjdbcdemo.common.CustomLocalDateTimeSerializer;
 import org.example.springbootjdbcdemo.entity.Book;
 
 import java.lang.reflect.Field;
@@ -25,6 +30,12 @@ public class ClassUtil {
 
     static {
         objectMapper.findAndRegisterModules();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+        module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        module.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
+        module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+        objectMapper.registerModule(module);
 //        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
@@ -188,7 +199,7 @@ public class ClassUtil {
         System.out.println("#### Instant.now(): " + Instant.now());
         System.out.println("#### LocalDateTime.now(): " + LocalDateTime.now());
         System.out.println("#### ZonedDateTime.now(): " + ZonedDateTime.now());
-        book1.setCreateDate(ZonedDateTime.now());
+//        book1.setCreateDate(ZonedDateTime.now());
         book1.setEffectiveDate(LocalDate.now());
         book1.setScheduledTime(LocalDateTime.now());
         Map<String, Object> map1 = new HashMap<>();
@@ -200,5 +211,8 @@ public class ClassUtil {
 
         Map<String, Object> map2 = ClassUtil.entityToMap(book1);
         System.out.println(map2);
+
+        Book book3 = ClassUtil.mapToEntity(map2, Book.class);
+        System.out.println(ClassUtil.entityToMap(book3));
     }
 }

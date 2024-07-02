@@ -1,7 +1,5 @@
 package org.example.springbootjdbcdemo.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -10,10 +8,11 @@ public class BookBase {
 
     private Integer totalPages;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+//    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime scheduledTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate effectiveDate;
 
 //    public String getAuthor() {
