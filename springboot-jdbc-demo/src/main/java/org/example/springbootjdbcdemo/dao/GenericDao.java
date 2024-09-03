@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.util.List;
 
 public interface GenericDao<T, K> {
+    T findById(K id, Class<T> entityType);
+
     T findById(K id);
 
     List<T> findAll();

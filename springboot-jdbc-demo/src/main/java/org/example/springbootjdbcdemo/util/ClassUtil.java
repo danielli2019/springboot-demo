@@ -104,14 +104,16 @@ public class ClassUtil {
                                 // 将Timestamp转换为LocalDateTime
                                 // Cannot convert the column of type TIMESTAMPTZ to requested type java.time.LocalDateTime
                                 // TODO
-                                LocalDateTime localDateTime = timestamp.toLocalDateTime();
-                                field.set(obj, localDateTime);
+                                if (timestamp != null) {
+                                    LocalDateTime localDateTime = timestamp.toLocalDateTime();
+                                    field.set(obj, localDateTime);
+                                }
                             } else if (rsmd.getColumnType(i) == 93 && type.getName().equals("java.time.ZonedDateTime")) {
                                 // 将timestamptz转换为ZonedDateTime
                                 // java.lang.IllegalArgumentException: Can not set java.time.ZonedDateTime field org.example.springbootjdbcdemo.entity.Book.createDate to java.sql.Timestamp
                                 System.out.println("TimestampTZ to ZonedDateTime");
                                 Timestamp ts = rs.getObject(i, java.sql.Timestamp.class);
-                                if(ts != null) {
+                                if (ts != null) {
                                     ZonedDateTime zdt = ts.toInstant().atZone(ZoneId.systemDefault());
                                     field.set(obj, zdt);
                                 } else {
@@ -122,7 +124,7 @@ public class ClassUtil {
                                 // java.lang.IllegalArgumentException: Can not set java.time.LocalDate field org.example.springbootjdbcdemo.entity.BookBase.effectiveDate to java.sql.Date
                                 System.out.println("Date to LocalDate");
                                 Date dt = rs.getObject(i, java.sql.Date.class);
-                                if(dt != null) {
+                                if (dt != null) {
 //                                    LocalDate ld = Instant.ofEpochMilli(dt.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
                                     LocalDate ld = dt.toLocalDate();
                                     field.set(obj, ld);

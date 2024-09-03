@@ -62,11 +62,11 @@ public class BookDao extends AbstractDao<Book, String> {
         return all ? "select * from books.book" : "select * from books.book where book_id = ?";
     }
 
-    @Override
-    protected Book mapRowToEntity(ResultSet rs) {
-        Book book = ClassUtil.rsToEntity(rs, Book.class);
-        return book;
-    }
+//    @Override
+//    protected Book mapRowToEntity(ResultSet rs) {
+//        Book book = ClassUtil.rsToEntity(rs, Book.class);
+//        return book;
+//    }
 
     @Override
     protected void setGeneratedKey(ResultSet rs, Book entity) throws SQLException {

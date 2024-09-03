@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -72,8 +71,8 @@ public class TestController {
             System.out.println("#### LocalDateTime.now(): " + LocalDateTime.now());
             System.out.println("#### ZonedDateTime.now(): " + ZonedDateTime.now());
             book1.setCreateDate(ZonedDateTime.now());
-            book1.setEffectiveDate(LocalDate.now());
-            book1.setScheduledTime(LocalDateTime.now());
+//            book1.setEffectiveDate(LocalDate.now());
+//            book1.setScheduledTime(LocalDateTime.now());
 //            Map<String, Object> map = new HashMap<>();
 //            map.put("bookId", "11");
 //            map.put("bookName", "test");
@@ -81,11 +80,14 @@ public class TestController {
             bookRepository.save(book1);
 
             // Query book
-            Book book = bookRepository.findById(book1.getBookId());
+            Book book = bookRepository.findById(book1.getBookId(), Book.class);
             // com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.ZonedDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: org.example.springbootjdbcdemo.entity.Book["createDate"])
             // add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to pom
             MAPPER.findAndRegisterModules();
-            System.out.println(MAPPER.writeValueAsString(book));
+            System.out.println("book1: " + MAPPER.writeValueAsString(book));
+
+            book = bookRepository.findById(book1.getBookId());
+            System.out.println("book2: " + MAPPER.writeValueAsString(book));
 
             // Update book
             book.setCreateBy("daniel");

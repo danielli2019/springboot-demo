@@ -3,9 +3,18 @@ package org.example.springbootjdbcdemo.dao;
 import org.example.springbootjdbcdemo.util.ClassUtil;
 import org.example.springbootjdbcdemo.util.ColumnUtil;
 
-import java.sql.*;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +31,37 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
             pstmt.setObject(1, id);
             System.out.println(pstmt.toString());
             try (ResultSet rs = pstmt.executeQuery()) {
+//                return rs.next() ? mapRowToEntity(rs) : null;
+
+                return rs.next() ? (T) mapRowToEntity(rs) : null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public T findById(K id, Class<T> entityType) {
+        Type superClass = getClass().getGenericSuperclass();
+        if (superClass instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) superClass;
+            Type[] argTypes = paramType.getActualTypeArguments();
+            if (argTypes.length > 0) {
+                Class<T> classType = (Class<T>) argTypes[0];
+                System.out.println(classType);
+            }
+        }
+
+        String sql = getSelectSql(false);
+        Connection connection = getConnection();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+
+            pstmt.setObject(1, id);
+            System.out.println(pstmt.toString());
+            try (ResultSet rs = pstmt.executeQuery()) {
+//                return rs.next() ? mapRowToEntity(rs) : null;
+
                 return rs.next() ? mapRowToEntity(rs) : null;
             }
         } catch (SQLException e) {
@@ -55,8 +95,8 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
             Object[] args = getInsertArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof java.util.Date) {
-                    args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
+                if (args[i] instanceof Date) {
+                    args[i] = new Timestamp(((Date) args[i]).getTime());
                 }
                 if (args[i] instanceof ZonedDateTime) {
                     Timestamp timestamp = Timestamp.from(((ZonedDateTime) args[i]).toInstant());
@@ -92,8 +132,8 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
             Object[] args = getUpdateArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof java.util.Date) {
-                    args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
+                if (args[i] instanceof Date) {
+                    args[i] = new Timestamp(((Date) args[i]).getTime());
                 }
                 if (args[i] instanceof ZonedDateTime) {
                     Timestamp timestamp = Timestamp.from(((ZonedDateTime) args[i]).toInstant());
@@ -123,8 +163,8 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
             Object[] args = getDeleteArgs(entity);
             int rows = 0;
             for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof java.util.Date) {
-                    args[i] = new Timestamp(((java.util.Date) args[i]).getTime());
+                if (args[i] instanceof Date) {
+                    args[i] = new Timestamp(((Date) args[i]).getTime());
                 }
                 pstmt.setObject(i + 1, args[i]);
             }
@@ -152,7 +192,36 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
 
     protected abstract String getSelectSql(boolean all);
 
-    protected abstract T mapRowToEntity(ResultSet rs);
+//    protected abstract T mapRowToEntity(ResultSet rs);
+
+    protected T mapRowToEntity(ResultSet rs) {
+        Class<T> entityType = null;
+        Type superClass = getClass().getGenericSuperclass();
+        if (superClass instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) superClass;
+            Type[] argTypes = paramType.getActualTypeArguments();
+            if (argTypes.length > 0) {
+                entityType = (Class<T>) argTypes[0];
+                System.out.println("entityTypes: " + Arrays.toString(argTypes));
+                System.out.println("entityType: " + entityType);
+            }
+        }
+
+//        Method method = null;
+//        try {
+//            method = AbstractDao.class.getMethod("findById", Object.class);
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException(e);
+//        }
+//        Type genericReturnType = method.getGenericReturnType();
+//        if (genericReturnType instanceof ParameterizedType) {
+//            ParameterizedType paramType = (ParameterizedType) genericReturnType;
+//            Class<T> classType = (Class<T>) paramType.getActualTypeArguments()[0];
+//            System.out.println("returnType for mapRowToEntity: " + classType);
+//        }
+
+        return ClassUtil.rsToEntity(rs, entityType);
+    }
 
     protected abstract void setGeneratedKey(ResultSet rs, T entity) throws SQLException;
 
