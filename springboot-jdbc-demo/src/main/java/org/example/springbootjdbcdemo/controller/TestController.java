@@ -5,7 +5,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.example.springbootjdbcdemo.dao.BookDao;
 import org.example.springbootjdbcdemo.dao.UserDao;
 import org.example.springbootjdbcdemo.entity.Book;
+import org.example.springbootjdbcdemo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +35,9 @@ public class TestController {
 
     @Autowired
     DataSource dataSource;
+
+    @Autowired
+    private BookService bookService;
 
     @RequestMapping(path = "/api/test", method = RequestMethod.GET)
     public String test() throws SQLException {
@@ -118,5 +123,10 @@ public class TestController {
             }
             return "DONE";
         }
+    }
+
+    @RequestMapping(path = "/api/book/{id}", method = RequestMethod.GET)
+    public Book getBook(@PathVariable String id) throws SQLException {
+        return bookService.getBook(id);
     }
 }

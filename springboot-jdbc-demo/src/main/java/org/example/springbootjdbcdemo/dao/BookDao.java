@@ -59,7 +59,7 @@ public class BookDao extends AbstractDao<Book, String> {
 
     @Override
     protected String getSelectSql(boolean all) {
-        return all ? "select * from books.book" : "select * from books.book where book_id = ?";
+        return all ? "select * from book" : "select * from book where book_id = ?";
     }
 
 //    @Override

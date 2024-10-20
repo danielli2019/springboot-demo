@@ -2,7 +2,12 @@ package org.example.springbootjdbcdemo.dao;
 
 import org.example.springbootjdbcdemo.util.ClassUtil;
 import org.example.springbootjdbcdemo.util.ColumnUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.sql.DataSource;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Connection;
@@ -19,12 +24,35 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDao.class);
+
+    @Autowired
+    @Qualifier("dynamicDataSource")
+    private DataSource dataSource;
 
     private Connection connection;
 
+    private static final ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
+
+    // TODO: When and Where to clear the connectionHolder
+    private Connection getConnectionFromHolder(){
+        Connection conn = connectionHolder.get();
+        if (null == conn) {
+            try {
+                conn = dataSource.getConnection();
+                conn.setSchema("book_user");
+            } catch (SQLException e) {
+                logger.error("Failed to get connection");
+                throw new RuntimeException(e);
+            }
+            connectionHolder.set(conn);
+        }
+        return conn;
+    }
+
     public T findById(K id) {
         String sql = getSelectSql(false);
-        Connection connection = getConnection();
+        Connection connection = getConnectionFromHolder();
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
 
@@ -39,6 +67,13 @@ public abstract class AbstractDao<T, K> implements GenericDao<T, K> {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+//        } finally {
+//            try {
+//                connection.close();
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 
     public T findById(K id, Class<T> entityType) {
