@@ -25,11 +25,9 @@ public class DynamicDataSourceConfig {
         CustomHikariConfig hikariConfig;
         DataSource defaultTargetDataSource = null;
         for (Properties properties : dataSourceList) {
-            common.forEach((key, value) -> {
-                if (!properties.containsKey(key)) {
-                    properties.setProperty(key.toString(), value.toString());
-                }
-            });
+            // append common properties
+            common.forEach(properties::putIfAbsent);
+
             hikariConfig = new CustomHikariConfig(properties);
             dataSource = new HikariDataSource(hikariConfig);
             if (null == defaultTargetDataSource) {
